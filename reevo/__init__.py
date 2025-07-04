@@ -60,21 +60,19 @@ class ReEvo:
         logging.info("Problem description: " + self.problem_desc)
         logging.info("Function name: " + self.func_name)
         
-        self.prompt_dir = f"{self.root_dir}/prompts"
+        #self.prompt_dir = f"{self.root_dir}/prompts"
+        self.prompt_dir = os.path.join(os.path.dirname(__file__), "prompts") #current working directory 
+
         self.output_file = f"{self.root_dir}/problems/{self.problem}/gpt.py"
         
         # Loading all text prompts
         # Problem-specific prompt components
-        prompt_path_suffix = "_black_box" if self.problem_type == "black_box" else ""
-        problem_prompt_path = f'{self.prompt_dir}/{self.problem}{prompt_path_suffix}'
-        self.seed_func = file_to_string(f'{problem_prompt_path}/seed_func.txt')
-        self.func_signature = file_to_string(f'{problem_prompt_path}/func_signature.txt')
-        self.func_desc = file_to_string(f'{problem_prompt_path}/func_desc.txt')
-        if os.path.exists(f'{problem_prompt_path}/external_knowledge.txt'):
-            self.external_knowledge = file_to_string(f'{problem_prompt_path}/external_knowledge.txt')
-            self.long_term_reflection_str = self.external_knowledge
-        else:
-            self.external_knowledge = ""
+        #prompt_path_suffix = "_black_box" if self.problem_type == "black_box" else ""
+        #problem_prompt_path = f'{self.prompt_dir}/{self.problem}{prompt_path_suffix}'
+        self.seed_func = self.cfg.problem.seed_func
+        self.func_signature = self.cfg.problem.func_signature
+        self.func_desc = self.cfg.problem.func_desc
+        self.external_knowledge = self.cfg.problem.external_knowledge
         
         
         # Common prompts
