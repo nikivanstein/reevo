@@ -3,7 +3,7 @@ import os
 import subprocess
 import re
 
-from utils.utils import block_until_running, file_to_string, filter_traceback
+from ..utils.utils import block_until_running, file_to_string, filter_traceback
 
 class Prompts:
     def __init__(self, problem_cfg, root_dir:str):

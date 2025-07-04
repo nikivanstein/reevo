@@ -4,7 +4,7 @@ from .original.getParas import Paras
 from .original import prob_rank, pop_greedy
 from .problem_adapter import Problem
 
-from utils.utils import init_client
+from ..utils.utils import init_client
 
 class EoH:
     def __init__(self, cfg, root_dir, client) -> None:

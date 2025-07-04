@@ -96,3 +96,6 @@ exclude_lines = [
     "pragma: no cover",
     "if **name** == .__main__.:",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["reevo"]
