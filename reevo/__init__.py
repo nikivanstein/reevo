@@ -45,7 +45,7 @@ class ReEvo:
         self.best_code_path_overall = None
         
         self.init_prompt()
-        #self.init_population() We do not perform this here because BLADE needs to override the evaluation function first.
+        #self.init_population() We do not perform this here because BLADE needs to override the evaluation function
 
 
     def init_prompt(self) -> None:
