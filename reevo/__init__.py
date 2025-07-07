@@ -56,9 +56,9 @@ class ReEvo:
         self.obj_type = self.cfg.problem.obj_type
         self.problem_type = self.cfg.problem.problem_type
         
-        logging.info("Problem: " + self.problem)
-        logging.info("Problem description: " + self.problem_desc)
-        logging.info("Function name: " + self.func_name)
+        #logging.info("Problem: " + self.problem)
+        #logging.info("Problem description: " + self.problem_desc)
+        #logging.info("Function name: " + self.func_name)
         
         #self.prompt_dir = f"{self.root_dir}/prompts"
         self.prompt_dir = os.path.join(os.path.dirname(__file__), "prompts") #current working directory 
@@ -101,9 +101,9 @@ class ReEvo:
 
     def init_population(self) -> None:
         # Evaluate the seed function, and set it as Elite
-        logging.info("Evaluating seed function...")
+        #logging.info("Evaluating seed function...")
         code = extract_code_from_generator(self.seed_func).replace("v1", "v2")
-        logging.info("Seed function code: \n" + code)
+        #logging.info("Seed function code: \n" + code)
         seed_ind = {
             "stdout_filepath": f"problem_iter{self.iteration}_stdout0.txt",
             "code_path": f"problem_iter{self.iteration}_code0.py",
@@ -123,7 +123,7 @@ class ReEvo:
         system = self.system_generator_prompt
         user = self.user_generator_prompt + "\n" + self.seed_prompt + "\n" + self.long_term_reflection_str
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-        logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+        #logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
 
         responses = self.generator_llm.multi_chat_completion([messages], self.cfg.init_pop_size, temperature = self.generator_llm.temperature + 0.3) # Increase the temperature for diverse initial population
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
@@ -140,10 +140,10 @@ class ReEvo:
         """
         Convert response to individual
         """
-        # Write response to file
-        file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
-        with open(file_name, 'w') as file:
-            file.writelines(response + '\n')
+        # Write response to file, no need for BLADE
+        # file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
+        # with open(file_name, 'w') as file:
+        #     file.writelines(response + '\n')
 
         code = extract_code_from_generator(response)
 
@@ -182,13 +182,13 @@ class ReEvo:
                 inner_runs.append(None)
                 continue
             
-            logging.info(f"Iteration {self.iteration}: Running Code {response_id}")
+            #logging.info(f"Iteration {self.iteration}: Running Code {response_id}")
             
             try:
                 process = self._run_code(population[response_id], response_id)
                 inner_runs.append(process)
             except Exception as e: # If code execution fails
-                logging.info(f"Error for response_id {response_id}: {e}")
+                #logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_runs.append(None)
         
@@ -199,7 +199,7 @@ class ReEvo:
             try:
                 inner_run.communicate(timeout=self.cfg.timeout) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
-                logging.info(f"Error for response_id {response_id}: {e}")
+                #logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_run.kill()
                 continue
@@ -221,7 +221,7 @@ class ReEvo:
             else: # Otherwise, also provide execution traceback error feedback
                 population[response_id] = self.mark_invalid_individual(population[response_id], traceback_msg)
 
-            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")
+            #logging.info(f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")
         return population
 
 
@@ -229,7 +229,7 @@ class ReEvo:
         """
         Write code into a file and run eval script.
         """
-        logging.debug(f"Iteration {self.iteration}: Processing Code Run {response_id}")
+        #logging.debug(f"Iteration {self.iteration}: Processing Code Run {response_id}")
         
         with open(self.output_file, 'w') as file:
             file.writelines(individual["code"] + '\n')
@@ -261,12 +261,12 @@ class ReEvo:
         # update elitist
         if self.elitist is None or best_obj < self.elitist["obj"]:
             self.elitist = population[best_sample_idx]
-            logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
+            #logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
-        best_path = self.best_code_path_overall.replace(".py", ".txt").replace("code", "response")
-        logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {print_hyperlink(best_path, self.best_code_path_overall)}")
-        logging.info(f"Iteration {self.iteration} finished...")
-        logging.info(f"Function Evals: {self.function_evals}")
+        #best_path = self.best_code_path_overall.replace(".py", ".txt").replace("code", "response")
+        #logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {print_hyperlink(best_path, self.best_code_path_overall)}")
+        #logging.info(f"Iteration {self.iteration} finished...")
+        #logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
         
     def rank_select(self, population: list[dict]) -> list[dict]:
@@ -348,7 +348,7 @@ class ReEvo:
         
         # Print reflection prompt for the first iteration
         if self.print_short_term_reflection_prompt:
-                logging.info("Short-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+                #logging.info("Short-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
                 self.print_short_term_reflection_prompt = False
         return message, worse_code, better_code
 
@@ -388,7 +388,7 @@ class ReEvo:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         
         if self.print_long_term_reflection_prompt:
-            logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+            #logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_long_term_reflection_prompt = False
         
         self.long_term_reflection_str = self.long_reflector_llm.multi_chat_completion([messages])[0]
@@ -425,7 +425,7 @@ class ReEvo:
             
             # Print crossover prompt for the first iteration
             if self.print_crossover_prompt:
-                logging.info("Crossover Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+                #logging.info("Crossover Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
                 self.print_crossover_prompt = False
         
         # Asynchronously generate responses
@@ -449,7 +449,7 @@ class ReEvo:
         )
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         if self.print_mutate_prompt:
-            logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+            #logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
         responses = self.mutation_llm.multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate))
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
